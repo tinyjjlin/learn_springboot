@@ -1,0 +1,36 @@
+server:
+  port: 8080
+
+
+mybatis:
+  mapper-locations:  classpath:mybatis/mapper/*.xml
+  type-aliases-package: com.brs.oadata.*.mapper
+  config-location: classpath:mybatis/mybatis-config.xml
+
+spring:
+  datasource:
+    name: mysql
+    type: com.alibaba.druid.pool.DruidDataSource
+   # driverClassName: com.mysql.jdbc.Driver
+   # driver-class-name: com.mysql.jdbc.Driver
+    platform: mysql
+    url: jdbc:mysql://127.0.0.1:3306/brs_oa_sys?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=UTC
+    username: root
+    password: root
+    initialSize: 5
+    minIdle: 5
+    maxActive: 20
+    maxWait: 60000
+    timeBetweenEvictionRunsMillis: 60000
+    minEvictableIdleTimeMillis: 300000
+    validationQuery: SELECT1FROMDUAL
+    testWhileIdle: true
+    testOnBorrow: false
+    testOnReturn: false
+    filters: stat,wall
+    logSlowSql: true
+pagehelper:
+ # dialect: mysql
+  reasonable: true
+  support-methods-arguments: true
+  params: count=countSql
