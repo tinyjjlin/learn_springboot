@@ -1,0 +1,10 @@
+#ldap配置信息，注意这里的userDn一定要写这种形式。referral设置为follow，连接AD时才需要配置
+ldap:
+  url: ldap://172.19.0.1:389
+  userDn: CN=Administrator,CN=Users,DC=brs,DC=dev
+  userPwd: Brs2017
+  referral: follow
+  domainName: '@brs.dev'
+  base: OU=Onestep,DC=brs,DC=dev
+server:
+  port: 8022
