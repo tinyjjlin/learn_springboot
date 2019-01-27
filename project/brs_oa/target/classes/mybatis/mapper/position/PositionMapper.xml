@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.brs.oa.position.mapper.PositionMapper">
+    <insert id="insert">
+        INSERT  INTO brs_oa_sys.position(name,enabled)VALUES (#{position.name},#{position.enabled})
+    </insert>
+    <update id="update">
+         UPDATE   brs_oa_sys.position
+         SET name = #{position.name}, enabled =#{position.enabled}
+         WHERE  brs_oa_sys.position.id = #{position.id}
+    </update>
+    <update id="updateEnabledStauts">
+        UPDATE   brs_oa_sys.position
+        SET  enabled =#{position.enabled}
+        WHETE brs_oa_sys.position.id = #{position.id}
+    </update>
+    <delete id="delete">
+        DELETE  FROM  brs_oa_sys.position WHERE  brs_oa_sys.position.id  = #{positionId}
+    </delete>
+
+    <select id="selectList" resultType="com.brs.oa.position.entity.Position">
+        SELECT id,name,enabled FROM  brs_oa_sys.position
+
+    </select>
+</mapper>

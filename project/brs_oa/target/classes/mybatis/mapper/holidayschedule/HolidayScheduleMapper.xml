@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.brs.oa.holidayschedule.mapper.HolidayScheduleMapper">
+
+    <sql id="holiday-sql">
+          h_day,
+          h_type,
+          h_festival
+
+    </sql>
+
+    <sql id="where_range">
+        <trim prefix="WHERE" suffixOverrides="AND | OR">
+            <if test="selectedDate != null">DATE_FORMAT(clock_day,'%Y-%m-%d') = DATE_FORMAT(#{selectedDate},'%Y-%m-%d')</if>
+        </trim>
+    </sql>
+    <select id="selectListByMonth" resultType="com.brs.oa.holidayschedule.entity.HolidaySchedule">
+
+        SELECT
+            <include refid="holiday-sql"></include>
+        FROM
+            holiday_schedule
+        WHERE
+              year(h_day)=year(#{selectedMonth}) and month(h_day)=month(#{selectedMonth})
+
+    </select>
+
+    <select id="selectListRange" resultType="com.brs.oa.holidayschedule.entity.HolidaySchedule">
+        SELECT
+        <include refid="holiday-sql"></include>
+        FROM
+        holiday_schedule
+        WHERE
+         DATE_FORMAT(h_day,'%Y-%m-%d') &gt;= DATE_FORMAT(#{startTime},'%Y-%m-%d')  AND
+         DATE_FORMAT(h_day,'%Y-%m-%d') &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d')
+
+    </select>
+    <select id="selectByDay" resultType="com.brs.oa.holidayschedule.entity.HolidaySchedule">
+
+        SELECT
+        <include refid="holiday-sql"></include>
+        FROM
+        holiday_schedule
+        WHERE
+        DATE_FORMAT(h_day,'%Y-%m-%d') &gt;= DATE_FORMAT(#{selectedDate},'%Y-%m-%d')
+
+    </select>
+</mapper>

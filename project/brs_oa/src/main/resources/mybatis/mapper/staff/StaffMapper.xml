@@ -1,0 +1,581 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.brs.oa.staff.mapper.StaffMapper">
+    <!-- 员工基本信息 -->
+    <sql id="staffBaseInfo_column">
+        department.dept_name  AS deptName,
+        staff.dept_no,
+        staff.emp_no,
+        staff.name,
+        staff.email,
+        staff.picture,
+        staff.gender,
+        staff.position,
+        staff.mobile
+    </sql>
+    <!-- 员工详细信息 -->
+    <sql id="staffDetailInfo_column">
+        staff.login_name,
+        staff.picture,
+        staff.emp_no,
+        staff.name,
+        staff.dept_no,
+        staff.email,
+        staff.birthday,
+        staff.hire_date,
+        staff.nation,
+        staff.politics_status,
+        staff.highest_degree,
+        staff.marital_status,
+        staff.mobile,
+        staff.current_address,
+        staff.address,
+        staff.nation_idcard,
+        staff.position,
+        (select name from position where staff.position = position.id) AS positionName,
+        staff.gender,
+        staff.native_place AS nativePlace,
+        staff.editable,
+        staff.social_insurance_account AS socialInsuranceAccount,
+        staff.bank_name AS bankName,
+        staff.bank_card AS bankCard,
+        staff.hobby,
+        staff.emergency_contact AS emergencyContact,
+        staff.emergency_contact_phone AS emergencyContactPhone,
+
+        department.dept_name,
+
+        education_record.id  AS  educationRecordId,
+        education_record.school_name,
+        education_record.start_end_time AS educationStartEndTime,
+        education_record.major,
+        education_record.diplomas,
+        education_record.is_national_unified,
+
+
+        work_record.id  AS  workExperienceId,
+        work_record.start_end_time AS  workStartEndTime,
+        work_record.company_name,
+        work_record.position AS oldPosition,
+        work_record.reason_to_leave,
+        work_record.certifier,
+        work_record.certifier_mobile,
+
+        train_record.id  AS trainRecordId,
+        train_record.start_end_time AS trainStartEndTime,
+        train_record.train_agency,
+        train_record.train_course
+    </sql>
+
+    <sql id="select_staffDetail_sql">
+        SELECT
+            <include refid="staffDetailInfo_column"></include>
+        FROM
+            staff
+        LEFT  JOIN
+            department
+        ON staff.dept_no = department.dept_no
+        LEFT  JOIN
+            education_record
+        ON  education_record.staff_emp_no = staff.emp_no
+        LEFT  JOIN
+        work_record
+        ON  work_record.staff_emp_no = staff.emp_no
+        LEFT JOIN
+            train_record
+        ON train_record.staff_emp_no = staff.emp_no
+    </sql>
+    <sql id="staffDetail_sql_where">
+        <trim prefix="WHERE" suffixOverrides="AND | OR">
+            <if test="empName != null">staff.name =#{empName} AND</if>
+            <if test="deptNo !=null"> staff.dept_no = #{deptNo}</if>
+        </trim>
+    </sql>
+
+
+    <sql id="where_dept_no">
+        <trim prefix="WHERE">
+            <if test="deptNo !=null"> department.dept_no = #{deptNo}</if>
+        </trim>
+    </sql>
+
+    <sql id="where_emp_no">
+        <trim prefix="WHERE">
+            <if test="empNo !=null"> staff.emp_no = #{empNo}</if>
+        </trim>
+    </sql>
+
+
+
+
+    <resultMap id="staffDetailInfoMap" type="com.brs.oa.staff.vo.StaffDetailInfo" autoMapping="true">
+        <id property="empNo" column="emp_no"></id>
+        <collection property="educationRecordList" ofType="com.brs.oa.staff.entity.EducationRecord" autoMapping="true">
+            <id property="educationRecordId" column="educationRecordId"></id>
+        </collection>
+
+        <collection property="workExperienceList" ofType="com.brs.oa.staff.entity.WorkRecord" autoMapping="true">
+            <id property="workExperienceId" column="workExperienceId"></id>
+        </collection>
+
+        <collection property="trainRecordList" ofType="com.brs.oa.staff.entity.TrainRecord" autoMapping="true">
+            <id property="trainRecordId" column="trainRecordId"></id>
+        </collection>
+
+    </resultMap>
+
+
+    <select id="queryStaffAll" resultType="com.brs.oa.staff.vo.SimpleStaffVo">
+        SELECT
+            <include refid="staffBaseInfo_column"></include>
+        FROM
+            brs_oa_sys.staff
+        LEFT  JOIN
+            brs_oa_sys.department
+        ON  department.dept_no =staff.dept_no
+    </select>
+
+
+    <select id="queryStaffByDeptNo" resultType="com.brs.oa.staff.vo.SimpleStaffVo">
+        SELECT
+            <include refid="staffBaseInfo_column"></include>
+        FROM
+            brs_oa_sys.staff
+        LEFT  JOIN
+            brs_oa_sys.department
+        ON  department.dept_no =staff.dept_no
+        <include refid="where_dept_no"></include>
+    </select>
+    <select id="selectApprover" resultType="com.brs.oa.staff.vo.SimpleStaffVo">
+        SELECT
+        <include refid="staffBaseInfo_column"></include>
+        FROM
+            staff
+        LEFT  JOIN
+            department
+        ON
+            department.dept_no =staff.dept_no
+        LEFT  JOIN
+            staff_role_relation as srr
+        ON
+            srr.emp_no = staff.emp_no
+        LEFT  JOIN
+            role
+        ON
+            srr.role_no = role.role_no
+        WHERE
+             role.role_name = #{roleName}
+    </select>
+
+    <select id="queryStaffByEmpNo" resultType="com.brs.oa.staff.vo.SimpleStaffVo">
+        SELECT
+            <include refid="staffBaseInfo_column"></include>
+        FROM
+            brs_oa_sys.staff
+        LEFT  JOIN
+            brs_oa_sys.department
+        ON  department.dept_no =staff.dept_no
+        WHERE
+           staff.emp_no =#{empNo}
+
+    </select>
+    <select id="queryStaffByEmpName" resultType="com.brs.oa.staff.vo.SimpleStaffVo">
+        SELECT
+            <include refid="staffBaseInfo_column"></include>
+        FROM
+            brs_oa_sys.staff
+        LEFT  JOIN
+            brs_oa_sys.department
+        ON  department.dept_no =staff.dept_no
+        WHERE
+            staff.name = #{empName}
+    </select>
+
+    <select id="queryStaffDetailByEmpNo" resultMap="staffDetailInfoMap">
+        <include refid="select_staffDetail_sql"></include>
+        WHERE
+        staff.emp_no =#{empNo}
+    </select>
+
+    <select id="queryStaffDetailByEmpName" resultMap="staffDetailInfoMap">
+        <include refid="select_staffDetail_sql"></include>
+        WHERE
+            staff.name = #{empName}
+    </select>
+    <select id="queryStaffDetailByDeptNoAndEmpName" resultMap="staffDetailInfoMap">
+        <include refid="select_staffDetail_sql"></include>
+        <include refid="staffDetail_sql_where"></include>
+    </select>
+    <select id="selectLoginStatus" resultType="java.lang.Integer">
+        select login_status from staff
+        where emp_no = #{empNo}
+
+    </select>
+    <select id="selectLoginAddr" resultType="java.lang.String">
+        SELECT login_addr from staff
+        where emp_no =#{empNo}
+
+    </select>
+
+
+
+    <insert id="insert" parameterType="java.util.List">
+        INSERT INTO staff
+        (emp_no,account)
+        VALUES
+
+        <foreach collection="list" item="person" index="index" separator=",">
+            <if test="person.empNo != 0">
+              (#{person.empNo},#{person.accountName})
+            </if>
+        </foreach>
+
+        ON DUPLICATE KEY UPDATE
+        account = VALUES(account)
+    </insert>
+
+
+    <update id="updateBaseInfoByEmpNo">
+        update staff
+        left join department
+        on staff.dept_no = department.dept_no
+
+        set
+         staff.name = #{baseInfo.name},
+         staff.gender =#{baseInfo.gender},
+         staff.politics_status =#{baseInfo.politicsStatus},
+         staff.nation = #{baseInfo.nation},
+         staff.hire_date=#{baseInfo.hireDate},
+       <!--  staff.mobile = #{baseInfo.mobile},
+         staff.email = #{baseInfo.email},-->
+         staff.hobby = #{baseInfo.hobby}
+
+        where staff.emp_no =#{baseInfo.empNo}
+    </update>
+    <update id="updateImportantInfoByEmpNo">
+
+        UPDATE staff
+        SET
+          staff.highest_degree =#{importantInfo.highestDegree},
+          staff.marital_status = #{importantInfo.maritalStatus},
+          staff.current_address =#{importantInfo.currentAddress},
+          staff.address = #{importantInfo.address},
+          staff.nation_idcard = #{importantInfo.nationIdcard},
+          staff.social_insurance_account =#{importantInfo.socialInsuranceAccount},
+          staff.bank_name =#{importantInfo.bankName},
+          staff.bank_card = #{importantInfo.bankCard},
+          staff.emergency_contact = #{importantInfo.emergencyContact},
+          staff.birthday = #{importantInfo.birthday},
+          staff.emergency_contact_phone = #{importantInfo.emergencyContactPhone}
+        WHERE staff.emp_no = #{importantInfo.empNo}
+    </update>
+
+
+    <sql id="edu-record-column">
+           school_name,
+           start_end_time,
+           major,
+           diplomas,
+           staff_emp_no,
+           is_national_unified
+    </sql>
+    <insert id="insertOrUpdateEduRecord">
+        insert into education_record
+        (
+           id,
+           school_name,
+           start_end_time,
+           major,
+           diplomas,
+           staff_emp_no)
+       values(
+           #{eduRecord.educationRecordId},
+           #{eduRecord.schoolName},
+           #{eduRecord.educationStartEndTime},
+           #{eduRecord.major},
+           #{eduRecord.diplomas},
+           #{eduRecord.staffEmpNo})
+       ON DUPLICATE KEY UPDATE
+          school_name = #{eduRecord.schoolName},
+          start_end_time= #{eduRecord.educationStartEndTime},
+          major = #{eduRecord.major},
+          diplomas= #{eduRecord.diplomas}
+
+    </insert>
+    <insert id="insertEduRecord">
+        insert into education_record
+         (
+           school_name,
+           start_end_time,
+           major,
+           diplomas,
+           staff_emp_no,
+           is_national_unified
+          )
+         VALUES (
+            #{eduRecord.schoolName},
+            #{eduRecord.educationStartEndTime},
+            #{eduRecord.major},
+            #{eduRecord.diplomas},
+            #{eduRecord.staffEmpNo},
+            #{eduRecord.isNationalUnified}
+        )
+
+    </insert>
+
+
+    <update id="updateEduRecord">
+        update  education_record
+        set
+           school_name = #{eduRecord.schoolName},
+           start_end_time =#{eduRecord.educationStartEndTime},
+           major = #{eduRecord.major},
+           diplomas= #{eduRecord.diplomas},
+           is_national_unified = #{eduRecord.isNationalUnified}
+          where id = #{eduRecord.educationRecordId}
+
+    </update>
+
+
+    <delete id="deleteEduRecordById">
+        delete  from education_record
+        where id =#{id}
+    </delete>
+
+
+
+    <insert id="insertWorkRecord">
+        insert  into work_record
+        (start_end_time, company_name, position, reason_to_leave, certifier, certifier_mobile, staff_emp_no)
+        values (
+        #{workRecord.workStartEndTime},
+        #{workRecord.companyName},
+        #{workRecord.oldPosition},
+        #{workRecord.reasonToLeave},
+        #{workRecord.certifier},
+        #{workRecord.certifierMobile},
+        #{workRecord.staffEmpNo}
+        )
+
+    </insert>
+
+
+    <update id="updateWorkRecord">
+        update work_record
+        set
+           start_end_time =  #{workRecord.workStartEndTime},
+           company_name =   #{workRecord.companyName},
+           position =   #{workRecord.oldPosition},
+           reason_to_leave=  #{workRecord.reasonToLeave},
+           certifier =  #{workRecord.certifier},
+           certifier_mobile =  #{workRecord.certifierMobile}
+        where work_record.id = #{workRecord.workExperienceId}
+
+    </update>
+
+
+    <delete id="deleteWorkRecord">
+        delete  from work_record
+        where work_record.id = #{id}
+    </delete>
+
+
+    <insert id="insertTrainRecord">
+        insert into train_record
+        (start_end_time, train_agency, train_course, staff_emp_no)
+        values (
+        #{trainRecord.trainStartEndTime},
+        #{trainRecord.trainAgency},
+        #{trainRecord.trainCourse},
+        #{trainRecord.staffEmpNo}
+        )
+
+
+    </insert>
+    <insert id="bindRole">
+        INSERT INTO staff_role_relation
+        (emp_no,role_no)
+        VALUES
+        <foreach collection="roleNoList" item="item" index="index" separator=",">
+            <if test="empNo != null">
+                (#{empNo},#{item})
+            </if>
+        </foreach>
+
+        ON DUPLICATE KEY UPDATE
+        role_no = VALUES(role_no)
+
+
+
+    </insert>
+    <insert id="insertLoginInfo">
+        INSERT INTO staff
+        (emp_no,login_addr)
+        VALUES
+        (#{empNo},#{loginAddr})
+        ON DUPLICATE KEY UPDATE
+        login_addr = #{loginAddr}
+    </insert>
+
+    <sql id="sql-initial">
+        staff.name AS empName,
+        emp_no AS empNo,
+        staff.dept_no AS deptNo,
+        (select dept_name from department where department.dept_no = staff.dept_no) AS deptName,
+        staff.position AS positionNo,
+        (select name from position where position.id = staff.position) AS positionName
+    </sql>
+
+    <select id="selectStaffInitialInfoList" resultType="com.brs.oa.staff.vo.StaffInitialInfoVo">
+      SELECT  <include refid="sql-initial"></include>
+      FROM staff
+      <include refid="where_emp_no"></include>
+    </select>
+
+    <update id="updateNewStaffInfo">
+        update staff
+        set
+          staff.name = #{newStaff.empName},
+          dept_no =  #{newStaff.deptNo},
+          staff.position = #{newStaff.positionNo}
+        where   emp_no = #{newStaff.empNo}
+
+    </update>
+
+    <insert id="insertNewStaff">
+        insert into staff
+        (
+          staff.editable,
+          staff.name,
+          emp_no,
+          dept_no,
+          staff.position
+
+        )
+        VALUES (
+             1,
+            #{newStaff.empName},
+            #{newStaff.empNo},
+            #{newStaff.deptNo},
+            #{newStaff.positionNo}
+
+        ) ON DUPLICATE KEY UPDATE
+        staff.editable = VALUES( staff.editable),
+        staff.name = VALUES(staff.name),
+        staff.dept_no = VALUES( staff.dept_no),
+        staff.position = VALUES( staff.position)
+
+
+    </insert>
+
+
+    <update id="updateTrainRecord">
+        update  train_record
+        set
+           train_record.start_end_time = #{trainRecord.trainStartEndTime},
+           train_record.train_agency = #{trainRecord.trainAgency},
+           train_record.train_course = #{trainRecord.trainCourse}
+        where
+           train_record.id = #{trainRecord.trainRecordId}
+
+
+
+    </update>
+    <update id="updateStaffHeaderImg">
+        update staff
+        set staff.picture =#{imageUrl}
+        where emp_no = #{empNo}
+    </update>
+    <update id="updateLoginStatus">
+        update staff
+        set login_status = #{loginStatus}
+        where emp_no = #{empNo}
+    </update>
+
+    <sql id="update-sql">
+        <trim prefix="set" suffixOverrides=",">
+            <if test="staffWorkflow.flowCategory == 1 and staffWorkflow.firstItemNewValue != null">mobile=#{staffWorkflow.firstItemNewValue},</if>
+            <if test="staffWorkflow.flowCategory == 2 and staffWorkflow.firstItemNewValue != null">email=#{staffWorkflow.firstItemNewValue},</if>
+            <if test="staffWorkflow.flowCategory == 3 and staffWorkflow.firstItemNewValue != null">highest_degree=#{staffWorkflow.firstItemNewValue},</if>
+            <if test="staffWorkflow.flowCategory == 4 and staffWorkflow.firstItemNewValue != null  and staffWorkflow.firstItemNewValue !=''">marital_status=cast(#{staffWorkflow.firstItemNewValue} as signed),</if>
+            <if test="staffWorkflow.flowCategory == 5 and staffWorkflow.firstItemNewValue != null">current_address=#{staffWorkflow.firstItemNewValue},</if>
+            <if test="staffWorkflow.flowCategory == 6 and staffWorkflow.firstItemNewValue != null and staffWorkflow.firstItemNewValue != ''">nation_idcard=#{staffWorkflow.firstItemNewValue},</if>
+            <if test="staffWorkflow.flowCategory == 7 and staffWorkflow.firstItemNewValue != null">address=#{staffWorkflow.firstItemNewValue},</if>
+            <if test="staffWorkflow.flowCategory == 8 and staffWorkflow.firstItemNewValue != null">social_insurance_account=#{staffWorkflow.firstItemNewValue},</if>
+            <if test="staffWorkflow.flowCategory == 9 and staffWorkflow.firstItemNewValue != null">bank_name=#{staffWorkflow.firstItemNewValue},</if>
+            <if test="staffWorkflow.flowCategory == 9 and staffWorkflow.secondItemNewValue != null">bank_card=#{staffWorkflow.secondItemNewValue},</if>
+
+            <if test="staffWorkflow.flowCategory == 10 and staffWorkflow.firstItemNewValue != null">emergency_contact=#{staffWorkflow.firstItemNewValue},</if>
+            <if test="staffWorkflow.flowCategory == 10 and staffWorkflow.secondItemNewValue != null">emergency_contact_phone=#{staffWorkflow.secondItemNewValue},</if>
+
+        </trim>
+    </sql>
+    <update id="updateStaffItems">
+        update staff
+        <include refid="update-sql"></include>
+        where emp_no = #{staffWorkflow.applicant}
+
+    </update>
+
+    <sql id="select-sql-generalInfo">
+            staff.name ,
+            staff.gender,
+            staff.birthday ,
+            staff.politics_status ,
+            staff.nation ,
+            staff.native_place,
+            staff.mobile ,
+            staff.email,
+            staff.highest_degree,
+            staff.marital_status ,
+            staff.current_address ,
+            staff.address ,
+            staff.nation_idcard,
+            staff.social_insurance_account,
+            staff.bank_name ,
+            staff.bank_card,
+            staff.emergency_contact,
+            staff.emergency_contact_phone
+    </sql>
+    <sql id="update-sql-generalInfo">
+           set
+           staff.name = #{staffGeneralInfo.empName},
+           staff.gender = #{staffGeneralInfo.gender},
+           staff.birthday = #{staffGeneralInfo.birthday},
+           staff.politics_status =#{staffGeneralInfo.politicsStatus},
+           staff.nation = #{staffGeneralInfo.nation},
+            staff.native_place = #{staffGeneralInfo.nativePlace},
+            staff.mobile = #{staffGeneralInfo.mobile},
+            staff.email = #{staffGeneralInfo.email},
+            staff.highest_degree = #{staffGeneralInfo.highestDegree},
+            staff.marital_status = #{staffGeneralInfo.maritalStatus},
+            staff.current_address = #{staffGeneralInfo.currentAddress},
+            staff.address = #{staffGeneralInfo.address},
+            staff.nation_idcard = #{staffGeneralInfo.nationIdcard},
+            staff.social_insurance_account = #{staffGeneralInfo.socialInsuranceAccount},
+            staff.bank_name = #{staffGeneralInfo.bankName},
+            staff.bank_card = #{staffGeneralInfo.bankCard},
+            staff.emergency_contact = #{staffGeneralInfo.emergencyContact},
+            staff.emergency_contact_phone = #{staffGeneralInfo.emergencyContactPhone},
+
+            staff.editable = 0
+    </sql>
+    <select id="selectStaffGeneralInfoList" resultType="com.brs.oa.staff.vo.StaffGeneralInfoVo">
+        SELECT  <include refid="select-sql-generalInfo"></include>
+        FROM  staff
+        <include refid="where_emp_no"></include>
+    </select>
+    <update id="updateStaffGeneralInfo">
+        update staff
+
+        <include refid="update-sql-generalInfo"></include>
+        WHERE staff.emp_no = #{staffGeneralInfo.empNo}
+    </update>
+
+
+    <delete id="deleteTrainRecord">
+        delete  from train_record
+        where train_record.id = #{id}
+    </delete>
+
+</mapper>

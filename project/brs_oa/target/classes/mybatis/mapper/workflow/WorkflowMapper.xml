@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.brs.oa.workflow.mapper.WorkflowMapper">
+
+    <sql id="workflow_sql">
+        serial_number,
+        work_name,
+        applicant,
+        (select name from staff where emp_no = applicant)  AS applicantName,
+        approver,
+        (select name from staff where emp_no = approver) AS approverName,
+        start_time,
+        end_time,
+        duration,
+        content,
+        flow_type,
+        (select name from leave_type where leave_type.code = flow_type)AS flowTypeName,
+        application_time,
+        approval_status,
+        approval_time,
+        prove_img
+
+    </sql>
+
+    <sql id="where_applicant_sql">
+        <trim prefix="WHERE" suffixOverrides="AND">
+            applicant=#{applicant} AND
+            <if test="selectDate != null"> DATE_FORMAT(application_time,'%Y-%m-%d')=DATE_FORMAT(#{selectDate},'%Y-%m-%d') AND </if>
+            <if test="leaveTypeCode != null"> flow_type = #{leaveTypeCode} AND </if>
+            <if test="approvalStatus != null"> approval_status = #{approvalStatus}</if>
+        </trim>
+    </sql>
+
+    <sql id="where_approver_sql">
+        <trim prefix="WHERE" suffixOverrides="AND">
+            approver=#{approver} AND
+            <if test="selectDate != null">  DATE_FORMAT(application_time,'%Y-%m-%d')=DATE_FORMAT(#{selectDate},'%Y-%m-%d') AND </if>
+            <if test="leaveTypeCode != null"> flow_type = #{leaveTypeCode} AND  </if>
+            <if test="approvalStatus != null"> approval_status = #{approvalStatus}</if>
+        </trim>
+    </sql>
+
+    <insert id="insert">
+        INSERT  INTO  workflow
+        (
+         work_name,
+         applicant,
+         approver,
+         start_time,
+         end_time,
+         duration,
+         content,
+         flow_type,
+         application_time,
+         approval_status,
+         approval_time,
+         prove_img
+        )VALUES (
+         #{workflow.workName},
+        #{workflow.applicant},
+        #{workflow.approver},
+         #{workflow.startTime},
+        #{workflow.endTime},
+        #{workflow.duration},
+        #{workflow.content},
+        #{workflow.flowType},
+        #{workflow.applicationTime},
+        #{workflow.approvalStatus},
+        #{workflow.approvalTime},
+        #{workflow.proveImg}
+
+        )
+
+
+    </insert>
+
+    <update id="updateApprovalStatus">
+        update workflow
+        set
+            approval_status = #{approvalStatus}
+        where
+            approver = #{approver} and serial_number = #{serialNumber}
+
+    </update>
+    <update id="updateApplicantMaterials">
+         update workflow
+        set
+            prove_img = #{proveImg}
+        where
+            applicant = #{applicant} and serial_number = #{serialNumber}
+
+
+    </update>
+
+    <select id="selectListByApprover" resultType="com.brs.oa.workflow.entity.Workflow">
+        SELECT
+            <include refid="workflow_sql"></include>
+        FROM
+            workflow
+        <include refid="where_approver_sql"></include>
+
+    </select>
+
+    <select id="selectListByApplicant" resultType="com.brs.oa.workflow.entity.Workflow">
+        SELECT
+        <include refid="workflow_sql"></include>
+        FROM
+        workflow
+        <include refid="where_applicant_sql"></include>
+
+    </select>
+
+
+    <select id="selectLeaveTypeList" resultType="com.brs.oa.workflow.entity.LeaveType">
+        select code,name
+        from leave_type
+
+    </select>
+    <select id="selectListByApplicantAndMonth" resultType="com.brs.oa.workflow.entity.Workflow">
+
+        SELECT
+        <include refid="workflow_sql"></include>
+        FROM
+        workflow
+        WHERE
+        applicant=#{applicant} and  year(start_time)=year(#{selectMonth}) and month(start_time)=month(#{selectMonth})
+
+
+    </select>
+</mapper>

@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.brs.oa.staffinfoworkflow.mapper.StaffInfoWorkflowMapper">
+
+    <sql id="sql_staff_workflow">
+
+        serial_number,
+        work_name,
+        flow_category,
+        applicant,
+        (select name from staff where emp_no = applicant)  AS applicantName,
+        approver,
+        (select name from staff where emp_no = approver) AS approverName,
+        (select description from staff_info_item where flow_category = staff_info_item.code) AS flowCategoryDescription,
+        apply_time,
+        approval_status,
+        first_item,
+        first_item_old_value,
+        first_item_new_value,
+        second_item,
+        second_item_old_value,
+        second_item_new_value
+    </sql>
+
+    <sql id="where_applicant_sql">
+        <trim prefix="WHERE" suffixOverrides="AND">
+            <if test="applicant != null">  applicant=#{applicant} AND </if>
+            <if test="selectDate != null"> DATE_FORMAT(apply_time,'%Y-%m-%d')=DATE_FORMAT(#{selectDate},'%Y-%m-%d') AND </if>
+            <if test="flowCategory != null"> flow_category = #{flowCategory} AND  </if>
+            <if test="approvalStatus != null"> approval_status = #{approvalStatus}</if>
+        </trim>
+    </sql>
+
+    <sql id="where_approver_sql">
+        <trim prefix="WHERE" suffixOverrides="AND">
+            <if test="approver !=null" >approver=#{approver} AND </if>
+            <if test="selectDate != null">  DATE_FORMAT(apply_time,'%Y-%m-%d')=DATE_FORMAT(#{selectDate},'%Y-%m-%d') AND </if>
+            <if test="flowCategory != null"> flow_category = #{flowCategory} AND  </if>
+            <if test="approvalStatus != null"> approval_status = #{approvalStatus}</if>
+        </trim>
+    </sql>
+
+    <insert id="insert">
+  INSERT  INTO  staff_info_workflow
+        (
+          work_name,
+          flow_category,
+          applicant,
+          approver,
+          apply_time,
+          approval_status,
+          first_item,
+          first_item_old_value,
+          first_item_new_value,
+          second_item,
+          second_item_old_value,
+          second_item_new_value
+        )VALUES (
+         #{workflow.workName},
+         #{workflow.flowCategory},
+        #{workflow.applicant},
+        #{workflow.approver},
+         #{workflow.applyTime},
+        #{workflow.approvalStatus},
+        #{workflow.firstItem},
+        #{workflow.firstItemOldValue},
+        #{workflow.firstItemNewValue},
+        #{workflow.secondItem},
+        #{workflow.secondItemOldValue},
+        #{workflow.secondItemNewValue}
+        )
+
+    </insert>
+
+
+    <update id="updateApprovalStatus">
+  update staff_info_workflow
+        set
+            approval_status = #{approvalStatus}
+        where
+            approver = #{approver} and serial_number = #{serialNumber}
+    </update>
+
+
+    <select id="selectListByApplicant" resultType="com.brs.oa.staffinfoworkflow.entity.StaffInfoWorkflow">
+         SELECT  <include refid="sql_staff_workflow"></include>
+        FROM staff_info_workflow
+
+        <include refid="where_applicant_sql"></include>
+
+    </select>
+
+
+    <select id="selectListByApprover" resultType="com.brs.oa.staffinfoworkflow.entity.StaffInfoWorkflow">
+         SELECT
+             <include refid="sql_staff_workflow"></include>
+        FROM staff_info_workflow
+        <include refid="where_approver_sql"></include>
+    </select>
+    <select id="selectApprovedOne" resultType="com.brs.oa.staffinfoworkflow.entity.StaffInfoWorkflow">
+        SELECT
+        <include refid="sql_staff_workflow"></include>
+        FROM   staff_info_workflow
+        where
+        approver = #{approver} and serial_number = #{serialNumber} and  approval_status = 1
+
+    </select>
+</mapper>
