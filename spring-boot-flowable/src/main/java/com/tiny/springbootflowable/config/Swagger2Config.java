@@ -1,4 +1,4 @@
-package com.brs.oa.comm.config;
+package com.tiny.springbootflowable.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,7 +24,7 @@ import java.util.List;
 @Configuration
 @EnableSwagger2
 public class Swagger2Config {
-    private String controller_package ="com.brs.oa";
+    private String controller_package ="com.tiny.springbootflowable";
     /**
      * swagger2的配置文件
      */
@@ -33,13 +33,6 @@ public class Swagger2Config {
     public Docket createRestApi() {
         ParameterBuilder ticketPar = new ParameterBuilder();
         List<Parameter> pars = new ArrayList<Parameter>();
-        ticketPar.name("Authorization").description("用户登录后获取的token,将其写入请求头部Authorization字段中")
-                .modelRef(new ModelRef("string")).parameterType("header")
-                //header中的ticket参数非必填，传空也可以
-                .required(false).build();
-        //根据每个方法名也知道当前方法在设置什么参数
-        pars.add(ticketPar.build());
-
 
         return new Docket(DocumentationType.SWAGGER_2)
                 .apiInfo(apiInfo())

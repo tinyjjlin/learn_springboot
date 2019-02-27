@@ -16,7 +16,7 @@
         <modeler:initiator-can-complete xmlns:modeler="http://flowable.org/modeler"><![CDATA[false]]></modeler:initiator-can-complete>
       </extensionElements>
     </userTask>
-    <userTask id="handleEditTask" name="handleEditTask" flowable:assignee="${editoralStaff}">
+    <userTask id="handleEditTask" name="handleEditTask" flowable:assignee="${editorialStaff}">
       <documentation>编辑人员撰写文章</documentation>
       <extensionElements>
         <modeler:initiator-can-complete xmlns:modeler="http://flowable.org/modeler"><![CDATA[false]]></modeler:initiator-can-complete>
@@ -41,16 +41,16 @@
     <sequenceFlow id="sid-288B4ADC-B8AA-42F7-8C80-5864E1E6A1E3" sourceRef="handleEditTask" targetRef="sid-DAA79FD2-8A6C-4425-970B-BAF0CCDC9611"></sequenceFlow>
     <exclusiveGateway id="sid-DAA79FD2-8A6C-4425-970B-BAF0CCDC9611"></exclusiveGateway>
     <sequenceFlow id="sid-C191EE93-0622-447B-BC16-E6697F5D0E4C" sourceRef="sid-DAA79FD2-8A6C-4425-970B-BAF0CCDC9611" targetRef="handleEditTask">
-      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${editStaus == '修改'}]]></conditionExpression>
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${editStatus == '修改'}]]></conditionExpression>
     </sequenceFlow>
     <sequenceFlow id="sid-64519F55-6309-4BAB-8B1E-2526A12FEC1A" sourceRef="handleDataTask" targetRef="handleEditTask"></sequenceFlow>
     <sequenceFlow id="sid-2B04C388-2686-46E8-AE2A-126D5BAF4DC8" sourceRef="sid-DAA79FD2-8A6C-4425-970B-BAF0CCDC9611" targetRef="handleContributeTask">
-      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${editStaus == '撰写完'}]]></conditionExpression>
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${editStatus == '撰写完'}]]></conditionExpression>
     </sequenceFlow>
     <endEvent id="sid-E446E52E-5388-4110-9E53-CC832CF2025A"></endEvent>
     <sequenceFlow id="sid-B9D28138-9D2E-48A4-935B-C353C18C22B2" sourceRef="handleContributeTask" targetRef="sid-E446E52E-5388-4110-9E53-CC832CF2025A"></sequenceFlow>
     <sequenceFlow id="sid-8DDA9FC4-B7C3-4E95-8CFB-3022AA2CA7C8" sourceRef="sid-DAA79FD2-8A6C-4425-970B-BAF0CCDC9611" targetRef="handleDataTask">
-      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${editStaus=='草稿'}]]></conditionExpression>
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${editStatus=='草稿'}]]></conditionExpression>
     </sequenceFlow>
   </process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_brsOrderProcess">

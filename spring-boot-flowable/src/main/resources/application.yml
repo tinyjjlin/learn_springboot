@@ -3,8 +3,16 @@ spring:
     url: jdbc:mysql://localhost/flowabledb?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=UTC
     username: root
     password: root
+  jpa:
+    hibernate:
+      ddl-auto: update
 flowable:
   async-executor-activate: false
 
 server:
-  port: 8082
+  port: 8084
+management:
+  endpoint:
+    flowable:
+      enabled: true
+

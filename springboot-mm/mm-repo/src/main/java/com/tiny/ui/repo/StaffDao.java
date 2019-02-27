@@ -1,4 +1,4 @@
-package com.tiny.service;
+package com.tiny.ui.repo;
 
 import com.tiny.entity.StaffEntity;
 
@@ -8,5 +8,5 @@ import com.tiny.entity.StaffEntity;
  */
 public interface StaffDao {
 
-    public StaffEntity findByName();
+    public StaffEntity findByName(String name);
 }
