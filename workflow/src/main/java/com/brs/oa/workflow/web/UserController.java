@@ -1,6 +1,6 @@
 package com.brs.oa.workflow.web;
 
-import com.brs.oa.workflow.model.ResultBean;
+import com.brs.oa.workflow.model.RestResult;
 import com.brs.oa.workflow.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -23,9 +23,9 @@ public class UserController {
 
     @ApiOperation(value = "创建新的用户")
     @PostMapping("/api/user")
-    ResultBean createUser(@RequestBody User user){
+    RestResult createUser(@RequestBody User user){
          userService.saveUser(user);
-        return new ResultBean(200,"create user success!");
+        return new RestResult(200,"create user success!");
     }
 
 }

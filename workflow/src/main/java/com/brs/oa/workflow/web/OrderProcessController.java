@@ -1,6 +1,6 @@
 package com.brs.oa.workflow.web;
 
-import com.brs.oa.workflow.model.ResultBean;
+import com.brs.oa.workflow.model.RestResult;
 import com.brs.oa.workflow.model.TaskRepresentation;
 import com.brs.oa.workflow.service.OrderProcessService;
 import io.swagger.annotations.Api;
@@ -31,16 +31,16 @@ public class OrderProcessController {
      */
     @ApiOperation("启动订单流程")
     @PostMapping("/api/process")
-    public ResultBean startProcessInstance(Long orderId){
+    public RestResult startProcessInstance(Long orderId){
        String processInstanceId = orderProcessService.startProcess(orderId);
-        return new ResultBean(200,"start process success!" ,processInstanceId);
+        return new RestResult(200,"start process success!" ,processInstanceId);
     }
 
     @ApiOperation("获取订单列表")
     @GetMapping("/api/order")
-    public ResultBean getTaskList(@RequestParam("assignee") String assignee){
+    public RestResult getTaskList(@RequestParam("assignee") String assignee){
         List<TaskRepresentation> tasks = orderProcessService.getTasks(assignee);
-        return new ResultBean(200,"获取订单列表",tasks );
+        return new RestResult(200,"获取订单列表",tasks );
     }
     /**
      * 经理确认订单
@@ -48,9 +48,9 @@ public class OrderProcessController {
      */
     @ApiOperation("确认订单")
     @GetMapping("/api/confirmOrder")
-    public ResultBean confirmOrder(@RequestParam("taskId")String taskId,@RequestParam("editorialDirectorId")Integer editorialDirectorId ){
+    public RestResult confirmOrder(@RequestParam("taskId")String taskId, @RequestParam("editorialDirectorId")Integer editorialDirectorId ){
          orderProcessService.confirmOrder(taskId,editorialDirectorId);
-        return new ResultBean(200,"confirm order" );
+        return new RestResult(200,"confirm order" );
     }
 
 
@@ -61,9 +61,9 @@ public class OrderProcessController {
      */
     @ApiOperation("分派订单")
     @GetMapping("/api/dispatchOrder")
-    public ResultBean dispatchOrder(@RequestParam("taskId")String taskId,@RequestParam("editorialStaffId")Integer editorialStaffId ){
+    public RestResult dispatchOrder(@RequestParam("taskId")String taskId, @RequestParam("editorialStaffId")Integer editorialStaffId ){
             orderProcessService.dispatchOrder(taskId, editorialStaffId);
-        return new ResultBean(200,"dispatch order" );
+        return new RestResult(200,"dispatch order" );
     }
 
 
@@ -73,9 +73,9 @@ public class OrderProcessController {
      */
     @ApiOperation("编辑出草稿")
     @GetMapping("/api/writeDraft")
-    public ResultBean writeDraft(@RequestParam("taskId")String taskId,@RequestParam("laboratoryStaffId")Integer laboratoryStaffId ){
+    public RestResult writeDraft(@RequestParam("taskId")String taskId, @RequestParam("laboratoryStaffId")Integer laboratoryStaffId ){
         orderProcessService.writeDraft(taskId,laboratoryStaffId );
-        return new ResultBean(200,"write a draft");
+        return new RestResult(200,"write a draft");
     }
 
     /**
@@ -84,9 +84,9 @@ public class OrderProcessController {
      */
     @ApiOperation("编辑完成文章")
     @GetMapping("/api/completeArticle")
-    public ResultBean completeArticle(@RequestParam("taskId")String taskId ){
+    public RestResult completeArticle(@RequestParam("taskId")String taskId ){
         orderProcessService.completeArticle(taskId);
-        return new ResultBean(200,"completeArticle");
+        return new RestResult(200,"completeArticle");
     }
 
     /**
@@ -96,8 +96,8 @@ public class OrderProcessController {
      */
     @ApiOperation("实验人员处理数据")
     @GetMapping("/api/handleData")
-    public ResultBean handleData(@RequestParam("taskId")String taskId){
+    public RestResult handleData(@RequestParam("taskId")String taskId){
         orderProcessService.handleData(taskId);
-        return new ResultBean(200,"handle data");
+        return new RestResult(200,"handle data");
     }
 }
