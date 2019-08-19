@@ -18,7 +18,7 @@ import java.sql.SQLException;
  * @description 用以mysql中json格式的字段，进行转换的自定义转换器，转换为实体类的JSONObject属性
  */
 @MappedTypes(JSONObject.class)
-@MappedJdbcTypes(JdbcType.VARCHAR)
+@MappedJdbcTypes(JdbcType.OTHER)
 public class MySqlJsonHandler extends BaseTypeHandler<JSONObject> {
 
     /**
